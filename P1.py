@@ -5,4 +5,4 @@ import numpy as np
 
 Class, d1, d2, d3, d4 = np.loadtxt("ds-1.txt", unpack=True)
 
-print(d1[1])
+print(d1[1:10])
