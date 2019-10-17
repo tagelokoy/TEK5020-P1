@@ -1,8 +1,20 @@
 import numpy as np
 
-# Leser datasett 1
-#ds1 = open("ds-1.txt", "r")
+# Leser datasett, legger data i trening- og testsett
+dataSet = np.loadtxt("ds-1.txt", unpack=False)
 
-Class, d1, d2, d3, d4 = np.loadtxt("ds-1.txt", unpack=True)
+trainingSet = np.zeros(dtype=float, shape=(int(dataSet.shape[0]/2), 5))
+j = 0
+for i in np.arange(0, 300, 2):
+    trainingSet[j] = dataSet[i]
+    j += 1
 
-print(d1[1:10])
+testSet = np.zeros(dtype=float, shape=(int(dataSet.shape[0] / 2), 5))
+j = 0
+for i in np.arange(1, 300, 2):
+    testSet[j] = dataSet[i]
+    j += 1
+
+print(trainingSet[0:10])
+print(testSet[0:10])
+print(dataSet[0:10])
