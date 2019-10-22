@@ -15,6 +15,64 @@ for i in np.arange(1, 300, 2):
     testSet[j] = dataSet[i]
     j += 1
 
-print(trainingSet[0:10])
-print(testSet[0:10])
-print(dataSet[0:10])
+
+# ------------------- Minimum feilrate klassifikator --------------------------
+# Finner først forventningsvektoren (my) og kovariansmatrisen (zeta)
+n1, n2 = 0, 0
+pVectorSum1 = np.array([0., 0., 0., 0.])
+pVectorSum2 = np.array([0., 0., 0., 0.])
+for item in trainingSet:
+    if item[0] == 1:            # Klasse 1
+        n1 += 1
+        pVectorSum1 += item[1:5]
+    else:                       # Klasse 2
+        n2 += 1
+        pVectorSum2 += item[1:5]
+
+my1 = 1/n1 * pVectorSum1        # Forventningsvektor for klasse 1
+my2 = 1/n2 * pVectorSum2        # Forventningsvektor for klasse 2
+
+sub1 = np.zeros(shape=(4, 4))
+sub2 = np.zeros(shape=(4, 4))
+for item in trainingSet:
+    if item[0] == 1:
+        sub1 += np.outer((item[1:5] - my1), (item[1:5] - my1))
+    else:
+        sub2 += np.outer((item[1:5] - my2), (item[1:5] - my2))
+zeta1 = 1/n1 * sub1             # Kovariansmatrise for klasse 1
+zeta2 = 1/n1 * sub2             # Kovariansmatrise for klasse 2
+
+# Finner så W, w, og w0 vha. my, zeta
+W1 = -0.5*np.linalg.inv(zeta1)
+W2 = -0.5*np.linalg.inv(zeta2)
+
+w1 = np.linalg.inv(zeta1).dot(my1)
+w2 = np.linalg.inv(zeta2).dot(my2)
+
+w01 = - 0.5*my1.dot(np.linalg.inv(zeta1)).dot(my1)\
+      - 0.5*np.log(np.linalg.det(zeta1)) + np.log(n1/dataSet.shape[0])
+w02 = - 0.5*my2.dot(np.linalg.inv(zeta2)).dot(my2)\
+      - 0.5*np.log(np.linalg.det(zeta2)) + np.log(n2/dataSet.shape[0])
+
+# Tester diskriminantfunksjonen på testsettet, velger klasse 1 dersom g1 > g2
+# ellers velges klasse 2 for en gitt egenskapsvektor x.
+results = np.zeros(shape=(testSet.shape[0],))
+trueClass = np.zeros(shape=(testSet.shape[0],))
+
+for i in np.arange(testSet.shape[0]):
+    trueClass[i] = testSet[i][0]
+    x = testSet[i][1:5]
+    g1 = x.dot(W1).dot(x) + w1.dot(x) + w01
+    g2 = x.dot(W2).dot(x) + w2.dot(x) + w02
+    if g1 > g2:
+        results[i] = 1
+    else:
+        results[i] = 2
+
+print(results)
+print(trueClass)
+print(results == trueClass)
+
+
+# ----------------------- Minste kvadaters metode -----------------------------
+# -------------------- Nærmeste nabo klassifikatoren --------------------------
