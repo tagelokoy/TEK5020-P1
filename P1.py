@@ -1,44 +1,48 @@
 import numpy as np
 
 # Leser datasett, legger data i trening- og testsett
-dataSet = np.loadtxt("ds-1.txt", unpack=False)
+datasetNumber = input("Type number for dataset: ")
+datasetName = "ds-" + datasetNumber + ".txt"
+dataSet = np.loadtxt(datasetName, unpack=False)
+length = dataSet.shape[0]
+width = dataSet.shape[1]
+trainingSet = np.zeros(dtype=float,
+                       shape=(int(length/2), width))
+testSet = np.zeros_like(trainingSet)
 
-trainingSet = np.zeros(dtype=float, shape=(int(dataSet.shape[0]/2), 5))
-j = 0
-for i in np.arange(0, 300, 2):
-    trainingSet[j] = dataSet[i]
-    j += 1
-
-testSet = np.zeros(dtype=float, shape=(int(dataSet.shape[0] / 2), 5))
-j = 0
-for i in np.arange(1, 300, 2):
-    testSet[j] = dataSet[i]
-    j += 1
+j, k = 0, 0
+for i in np.arange(0, length):
+    if i % 2 != 0:
+        trainingSet[j] = dataSet[i]
+        j += 1
+    else:
+        testSet[k] = dataSet[i]
+        k += 1
 
 
 # ------------------- Minimum feilrate klassifikator --------------------------
 # Finner først forventningsvektoren (my) og kovariansmatrisen (zeta)
 n1, n2 = 0, 0
-pVectorSum1 = np.array([0., 0., 0., 0.])
-pVectorSum2 = np.array([0., 0., 0., 0.])
+pVectorSum1 = np.zeros(shape=(width-1,))
+pVectorSum2 = np.zeros_like(pVectorSum1)
 for item in trainingSet:
     if item[0] == 1:            # Klasse 1
         n1 += 1
-        pVectorSum1 += item[1:5]
+        pVectorSum1 += item[1:width]
     else:                       # Klasse 2
         n2 += 1
-        pVectorSum2 += item[1:5]
+        pVectorSum2 += item[1:width]
 
 my1 = 1/n1 * pVectorSum1        # Forventningsvektor for klasse 1
 my2 = 1/n2 * pVectorSum2        # Forventningsvektor for klasse 2
 
-sub1 = np.zeros(shape=(4, 4))
-sub2 = np.zeros(shape=(4, 4))
+sub1 = np.zeros(shape=(width-1, width-1))
+sub2 = np.zeros_like(sub1)
 for item in trainingSet:
     if item[0] == 1:
-        sub1 += np.outer((item[1:5] - my1), (item[1:5] - my1))
+        sub1 += np.outer((item[1:width] - my1), (item[1:width] - my1))
     else:
-        sub2 += np.outer((item[1:5] - my2), (item[1:5] - my2))
+        sub2 += np.outer((item[1:width] - my2), (item[1:width] - my2))
 zeta1 = 1/n1 * sub1             # Kovariansmatrise for klasse 1
 zeta2 = 1/n1 * sub2             # Kovariansmatrise for klasse 2
 
@@ -57,11 +61,11 @@ w02 = - 0.5*my2.dot(np.linalg.inv(zeta2)).dot(my2)\
 # Tester diskriminantfunksjonen på testsettet, velger klasse 1 dersom g1 > g2
 # ellers velges klasse 2 for en gitt egenskapsvektor x.
 results = np.zeros(shape=(testSet.shape[0],))
-trueClass = np.zeros(shape=(testSet.shape[0],))
+trueClass = np.zeros_like(results)
 
 for i in np.arange(testSet.shape[0]):
     trueClass[i] = testSet[i][0]
-    x = testSet[i][1:5]
+    x = testSet[i][1:width]
     g1 = x.dot(W1).dot(x) + w1.dot(x) + w01
     g2 = x.dot(W2).dot(x) + w2.dot(x) + w02
     if g1 > g2:
