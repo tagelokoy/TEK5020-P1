@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn import metrics
 
 # Leser datasett, legger data i trening- og testsett
 datasetNumber = input("Type number for dataset: ")
@@ -19,6 +20,7 @@ for i in np.arange(0, length):
         testSet[k] = dataSet[i]
         k += 1
 
+trueClassLabel = testSet[:,0]
 
 # ------------------- Minimum feilrate klassifikator --------------------------
 # Finner først forventningsvektoren (my) og kovariansmatrisen (zeta)
@@ -73,10 +75,82 @@ for i in np.arange(testSet.shape[0]):
     else:
         results[i] = 2
 
-print(results)
-print(trueClass)
-print(results == trueClass)
+print("\n------------------- Minimum feilrate klassifikator --------------------------")
+print("\nPredikerte klasser:\n", results)
+print("\nFaktiske klasser:\n", trueClass)
+print("\nSammenligning: \n",results == trueClass)
+
+compare = results == trueClass
+n_feil = 0
+for bool in compare:
+    if bool == False:
+        n_feil+=1
+feilrate_minimumFeil = n_feil/compare.size
+
+# ----------------------- Minste kvadraters metode -----------------------------
+#Importerer modell for minste kvadaters metode
+from sklearn import datasets, linear_model
+
+#Minste kvadraters lineær regresjon
+leastSquare = linear_model.LinearRegression()
+
+#Trener modellen med treningssettet
+leastSquare.fit(trainingSet[:,1:width], trainingSet[:,0])
+
+#Forutser responsen for testsettet
+pred = leastSquare.predict(testSet[:,1:width])
+pred_leastSquare = np.round(pred)
+
+print("\n\n----------------------- Minste kvadraters metode -----------------------------")
+print("\nPredikerte klasser:\n", pred_leastSquare)
+print("\nFaktiske klasser:\n", trueClassLabel)
+print("\nSammenligning: \n",pred_leastSquare == trueClassLabel)
+
+compare = pred_leastSquare == trueClassLabel
+n_feil = 0;
+for bool in compare:
+    if bool == False:
+        n_feil+=1;
+feilrate_leastSquare = n_feil/compare.size
 
 
-# ----------------------- Minste kvadaters metode -----------------------------
 # -------------------- Nærmeste nabo klassifikatoren --------------------------
+#Importerer nærmeste nabo klassifikatormodell
+from sklearn.neighbors import KNeighborsClassifier
+
+#Lager klassifikator (k = 1)
+nearestNeighbour = KNeighborsClassifier(n_neighbors=1, weights='uniform', p=2)
+
+#Trener modellen med treningssettet
+nearestNeighbour.fit(trainingSet[:,1:5], trainingSet[:,0])
+
+#Forutser responsen for testsettet
+pred_nn = nearestNeighbour.predict(testSet[:,1:5])
+
+print("\n\n-------------------- Nærmeste nabo klassifikatoren --------------------------")
+print("\nPredikerte klasser:\n", pred_nn)
+print("\nFaktiske klasser:\n", trueClassLabel)
+print("\nSammenligning: \n",pred_nn == trueClassLabel)
+
+compare = pred_nn == trueClassLabel
+n_feil = 0;
+for bool in compare:
+    if bool == False:
+        n_feil+=1;
+feilrate_nn = n_feil/compare.size
+
+#------------------------------ Oppsummering ----------------------------------
+
+print("\n------------------------------ Oppsummering ----------------------------------")
+
+print("\nFeilrateestimat, minimum feilrate:", feilrate_minimumFeil)
+
+print("\nFeilrateestimat, minste kvadraters metode:", feilrate_leastSquare)
+
+print("\nFeilrateestimat, nærmeste nabo:", feilrate_nn)
+
+print("\nNøyaktighet, minimum feilrate, datasett "+datasetNumber+":",metrics.accuracy_score(trueClass, results))
+
+print("\nNøyaktighet, minste kvadraters metode, datasett "+datasetNumber+":",metrics.accuracy_score(trueClassLabel , pred_leastSquare))
+
+print("\nNøyaktighet, nærmeste nabo, datasett "+datasetNumber+":",metrics.accuracy_score(trueClassLabel, pred_nn),"\n")
