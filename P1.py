@@ -2,7 +2,7 @@ import numpy as np
 from sklearn import metrics
 
 # Leser datasett, legger data i trening- og testsett
-datasetNumber = input("Type number for dataset: ")
+datasetNumber = input("Type number for data set: ")
 datasetName = "ds-" + datasetNumber + ".txt"
 dataSet = np.loadtxt(datasetName, unpack=False)
 length = dataSet.shape[0]
@@ -21,6 +21,12 @@ for i in np.arange(0, length):
         k += 1
 
 trueClassLabel = testSet[:,0]
+
+# ------------------------------ Feilrate -------------------------------------
+def error_rate(classifications, key_class):
+    errors = np.asarray(np.where(classifications != key_class))
+    rate = errors.size / classifications.size
+    return rate
 
 # ------------------- Minimum feilrate klassifikator --------------------------
 # Finner først forventningsvektoren (my) og kovariansmatrisen (zeta)
@@ -75,6 +81,7 @@ for i in np.arange(testSet.shape[0]):
     else:
         results[i] = 2
 
+
 print("\n------------------- Minimum feilrate klassifikator --------------------------")
 print("\nPredikerte klasser:\n", results)
 print("\nFaktiske klasser:\n", trueClass)
@@ -113,6 +120,9 @@ for bool in compare:
         n_feil+=1;
 feilrate_leastSquare = n_feil/compare.size
 
+rate1 = error_rate(results, trueClass)
+print("Error rate for", datasetName, "using minimum error classification:",
+      rate1)
 
 # -------------------- Nærmeste nabo klassifikatoren --------------------------
 #Importerer nærmeste nabo klassifikatormodell
@@ -154,3 +164,4 @@ print("\nNøyaktighet, minimum feilrate, datasett "+datasetNumber+":",metrics.ac
 print("\nNøyaktighet, minste kvadraters metode, datasett "+datasetNumber+":",metrics.accuracy_score(trueClassLabel , pred_leastSquare))
 
 print("\nNøyaktighet, nærmeste nabo, datasett "+datasetNumber+":",metrics.accuracy_score(trueClassLabel, pred_nn),"\n")
+
