@@ -1,0 +1,18 @@
+Avsluttende spørsmål:
+1. Hvorfor er det fornuftig å benytte nærmeste-nabo klassifikatoren til å finne gunstige
+egenskapskombinasjoner?
+
+
+2. Hvorfor kan det i en praktisk anvendelse være fornuftig å finne en lineær eller kvadratisk
+klassifikator til erstatning for nærmeste-nabo klassifikatoren?
+
+Nærmeste nabo krever mye minne, da man lagrer hele treningssettet, og søker gjennom det for hvert objekt som skal klassifiseres. Dette fører også til lang regnetid.
+
+
+3. Hvorfor er det lite gunstig å bruke samme datasettet både til trening og evaluering av en
+klassifikator?
+
+
+4. Hvorfor gir en lineær klassifikator dårlige resultater for datasett 2?
+
+Noe med overtrening? Hvis du har for mange egenskaper, blir klassifikatoren spesialisert til gjenkjenning av treningssettet, men nøyaktigheten for å predikere ny data synker. Mange egenskaper i fohold til antall sampler. Har ikke helt klar å se at lineære modeller er mer følsomme.
